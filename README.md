@@ -68,4 +68,38 @@ Hands-free Customer Support: Eliminates manual answering of common queries with 
 6. Scalable, Low-Code Automation  
    Thanks to n8n, this project is extendable, low-code, and cost-effective to maintain and deploy.
 
- 
+  ### Data File
+
+   
+## 📄 Menu Data Extraction Workflow  
+### PDF-to-Text Conversion for Dynamic Voice Responses
+
+This workflow enables the Voice AI Agent to dynamically respond to customer menu queries by extracting text from a stored PDF file. It is designed to be **triggered by another workflow**(i.e Voice AI Agent Workflow), making it modular and reusable across different automation flows.
+
+### 🔧 Workflow Components
+
+| Node                        | Description                                              |
+|-----------------------------|----------------------------------------------------------|
+| **Execute Workflow Trigger**| Activated by another workflow to begin extraction        |
+| **Download PDF File**       | Retrieves the menu PDF from Google drive     |
+| **Extract Text from PDF**   | Converts content into plain text for AI voice responses  |
+
+### 🧠 Problem Solved
+
+- ❌ Static, hardcoded menus limit flexibility and create update overhead  
+- ❌ Manual entry of menu items is time-consuming and error-prone  
+- ❌ Voice agent can’t access current menu data in real time
+
+### ✅ Solution Provided
+
+- ✅ Automatically parses the menu from the PDF file  
+- ✅ Modular: triggered by other workflows whenever menu is needed  
+- ✅ Sends extracted text to ElevenLabs or chatbot for natural voice delivery
+
+### 📦 Use Case Example
+
+> **Customer says:** “What’s available for lunch?”  
+> ✅ Voice AI triggers the extraction workflow  
+> ✅ PDF is downloaded and parsed  
+> ✅ Text extracted: _“Grilled Chicken ₦3,000, Jollof Rice ₦2,500...”
+> ✅ ElevenLabs speaks it back clearly and naturally
