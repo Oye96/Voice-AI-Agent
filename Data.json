@@ -1,0 +1,104 @@
+{
+  "name": "Data",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\n\"query\":\"Amala\"\n}"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0dbbba65-e41a-4335-82b5-d32a839ecd13",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1XiViv4hmOjC1HOKyha17f_cNGBO52JKz",
+          "mode": "list",
+          "cachedResultName": "Menu",
+          "cachedResultUrl": "https://drive.google.com/file/d/1XiViv4hmOjC1HOKyha17f_cNGBO52JKz/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        220,
+        0
+      ],
+      "id": "bf6282bd-b2b1-4809-be42-6cfd79fccf63",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "vRxU1XHpvBbyOV2o",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        440,
+        0
+      ],
+      "id": "fe213891-4c6c-4607-8194-621a20e79674",
+      "name": "Extract from File"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "query": "Amala"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "dc433a2b-ea89-4286-91f8-109264e870a0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e109120b882763c0222d931e4266a2bf7f995d61c6040fdf44ea84d1693d752c"
+  },
+  "id": "dMTmnJuaLmVcAP3p",
+  "tags": []
+}

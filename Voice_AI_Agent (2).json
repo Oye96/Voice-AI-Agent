@@ -1,0 +1,893 @@
+{
+  "name": "Voice AI Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "a97349f6-b3a9-4a30-8f0f-ae30c20a7438",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0ab41d11-7406-4897-acb7-5673b5b83f4b",
+      "name": "Webhook",
+      "webhookId": "a97349f6-b3a9-4a30-8f0f-ae30c20a7438"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.query }}",
+        "options": {
+          "systemMessage": "= ## Overview\nYou are a Restaurant AI Agent designed to assist customers by taking food orders and booking reservations through natural, conversational interactions. Your goal is to provide a seamless and efficient customer experience by recognizing intent, processing orders and reservations accurately, and ensuring user satisfaction.\n\n## Context\n- Customers interact via voice or text to place food orders or book reservations.\n- The AI must clearly recognize and confirm user intents.\n- The system should be conversational, polite, and responsive within 3 seconds.\n- If user input is unclear, the AI should request clarification.\n- The AI must handle order modifications and reservation changes smoothly.\n- If needed, escalate issues to a human staff member.\n\n## Instructions\n\n# Order Handling Process\n\n## Steps for Processing Orders\n\n\n### 1. Take the Order\n- Gather order details from the customer, including:\n  -**Food Items** \n  -**Quantity** \n  -**Special Instructions**  (e.g., no onions, extra sauce)\n  -**Pickup/Delivery Preference** \n  -**Requested Time** \n  -**Customer Name** \n\n### 2. Check Menu Availability\n- Check the **Menu Database** tool to verify if the ordered items exist on the restaurant menu.\n- If an item is unavailable, suggest alternative options.\n\n\n### 3. Confirm Order\n- If all items are available, confirm the order with the customer by summarizing:\n- Ordered Items & Quantity\n- Special Instructions\n- Pickup/Delivery Details\n- Allow modifications if necessary.\n\n### 4. Finalize and Process\n- Once confirmed, use the **Get Orders** tool to check the trend in order details and then use the **Update Orders** tool to update the order details.\n- Provide an estimated preparation time and delivery/pickup instructions.\n\n# Reservation Process\n\n## Steps for Handling Reservations\n\n### 1. Check **Reservation Availability**\n- Retrieve available reservation slots.\n- If requested slot is unavailable, offer alternative time options.\n\n### 2. Confirm Reservation\n- Gather the following details:\n  -** Reservation ID**\n  -** Customer Name**\n  -** Contact Number**\n  -** Email**\n  -** Reservation Date**\n  -** Reservation Time**\n  -** Number of Guests**\n  -** Seating Preference**\n  -** Special Requests**\n- Confirm reservation and communicate details to the customer.\n### 3. Update Reservation Availability\n- Use the **Get Reservations Availability** tool to check availability.\n\n### 4. Update Confirmed Reservation\n\n**Always follow these steps in order—no exceptions!**\n1) ** Check Reservation Availability**\n  - Use the **Get Reservations Availability** tool to check all reservations for that date.\n\n2) **Block the Reserved Time Slot**\n  - Use the **Update Reservations Availability** tool to block the time slot that has been reserved.\n- **DO NOT** change or remove any other time slots—they must remain exactly as they were before.\n\n3) **Update the Confirmed Reservation**\n  - Use the **Update Confirmed Reservation** tool to update all details for the reservation.\n**Failure to follow these steps could result in double booking!**\nAlways verify before making updates.\n\n### 5. Modify Reservation (If Required)\n### Reservation Update Steps:\n  - Obtain the existing reservation information.\n  - Use the **Get Reservations Availability** tool to review all reservations on the specified date.\n\n  - Utilize the **Update Reservations Availability** tool to block the newly reserved time slot, preventing double booking.\n  - Clearly indicate the client's original time slot (the one being rescheduled) as available.\n  - Verify the previous availability status of this slot using the **Memory Tool**, confirming its status from the last time it was available.\n  - Use the existing reservation information before the modification to keep all the other time slots unchanged, preserving their existing information.\n### 6. Finalize and Communicate\n- Confirm the final details with the customer.\n- Close the reservation process smoothly.\n### 4. User Experience\n  - Maintain a conversational and friendly tone.\n  - Handle misunderstandings gracefully:\n  - “Sorry, I didn't catch that. Could you repeat your request?”\n  - Offer escalation if needed:\n  - “Would you like to speak with a staff member? Connecting you now.”\n\n- Close interaction professionally:\n  \"Thank you for contacting Item 7. Have a great day!\"\n\n## Tools\n**Gemini Chat Model**:Used for enhancing natural responses, summarizing content, or refining customer phrasing.\n\n**Simple Memory**: Stores temporary context during each voice session (e.g., last menu items shared, pickup preference).\n    ➤ Use when tracking multi-turn interactions, preventing repetition, or interpreting follow-ups like “add that too.”\n\n\n\n**Menu Database**:Contains all food items organized by rows.\n    ➤ Use to fetch 3 items at a time when the customer asks to “see the menu” or wants more options.\n    ➤ Do not show items unless asked.\n    ➤ When user requests category items (e.g., \"local dishes\"), filter by category tag (if supported).\n (for available food items)\n\n**Get Reservation Availability**: Use when checking available time slots before confirming a booking.\n\n **Update Reservation Availability**: Use when marking a time slot as reserved after confirmation.\n\n **Get Confirmed Reservation**: Use when customer wants to modify or cancel a past booking.\n\n **Update Confirmed Reservation**: Use when finalizing a new or updated reservation and saving to the Reservation Sheet.\n\n- **Get Orders**: Use when customer refers to a past order or wants to repeat a previous one.\n\n**Update Orders**: Use when a new food order is confirmed and should be stored in the Orders Google Sheet.\n    ➤ Ensure order ID, time, quantity, and customer details are saved.\n\n\n\n## Examples\n### Example 1: Food Order\n**Customer:** \"I'd like three veggie burgers, one with no tomato, and an order of fries, for pickup at 6:30 pm.\"\n**AI Response:** \"Confirming your order: three veggie burgers—one without tomato—and one order of fries. Pickup at 6:30 pm. Is that correct?\"\n\n### Example 2: Reservation Booking\n**Customer:** \"I'd like a table for two tomorrow at 8 pm near the window.\"\n**AI Response:** \"Your reservation for two people tomorrow at 8 pm, near the window, is confirmed. See you then!\"\n\n## Final Notes\n-**Never ever**\n-Ensure all interactions are clear, polite, and efficient.\n- Minimize response time for better user experience.\n- Always confirm user details before finalizing transactions.\n- Current date {{ $now }}\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        280,
+        0
+      ],
+      "id": "3db2ee7a-6bd7-4f5c-8dc9-d65bb934b4e4",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-preview-04-17",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -260,
+        220
+      ],
+      "id": "0de140b7-ea14-414b-b0ad-b5880a4e7269",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "kkgZXjBFC2BJ9N4F",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook') }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -40,
+        240
+      ],
+      "id": "da5a7e29-6afc-44c1-a91b-b0fc22b3932f",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wZs0OOmCWi6k74u4QbjZNDKJCRWZ2AZqNTfwoFr0EwE",
+          "mode": "list",
+          "cachedResultName": "Olas Food Retaurant",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wZs0OOmCWi6k74u4QbjZNDKJCRWZ2AZqNTfwoFr0EwE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wZs0OOmCWi6k74u4QbjZNDKJCRWZ2AZqNTfwoFr0EwE/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        160,
+        220
+      ],
+      "id": "10403f85-e7f0-4ae2-a11a-04bce5ae4fb8",
+      "name": "Get Reservation Availability",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PxwoNtyH4xzWzz6T",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1wZs0OOmCWi6k74u4QbjZNDKJCRWZ2AZqNTfwoFr0EwE",
+          "mode": "list",
+          "cachedResultName": "Olas Food Retaurant",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wZs0OOmCWi6k74u4QbjZNDKJCRWZ2AZqNTfwoFr0EwE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wZs0OOmCWi6k74u4QbjZNDKJCRWZ2AZqNTfwoFr0EwE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $fromAI('Date__using_to_match_', 'This Specifies the day the customer wants to make a reservation.') }}",
+            "Time": "={{ $fromAI('Time', 'This Represents the specific time slot the customer requests for reservation.') }}"
+          },
+          "matchingColumns": [
+            "Date"
+          ],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Time",
+              "displayName": "Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        320,
+        240
+      ],
+      "id": "ba7a692e-e7ec-4791-8ebc-24dcb28bcc9c",
+      "name": "Update Reservation Availability",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PxwoNtyH4xzWzz6T",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1V0B8k0b3wOyM9xGS4HNxYVsm9zPMd48g2Ty1DhGQ8fI",
+          "mode": "list",
+          "cachedResultName": "Confirmed Reservation Olas Food Restaurant",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1V0B8k0b3wOyM9xGS4HNxYVsm9zPMd48g2Ty1DhGQ8fI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1V0B8k0b3wOyM9xGS4HNxYVsm9zPMd48g2Ty1DhGQ8fI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "Reservation ID"
+          ],
+          "schema": [
+            {
+              "id": "Reservation ID",
+              "displayName": "Reservation ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Contact Number",
+              "displayName": "Contact Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Reservation Date",
+              "displayName": "Reservation Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Reservation Time",
+              "displayName": "Reservation Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Number of Guest",
+              "displayName": "Number of Guest",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Seating Preference",
+              "displayName": "Seating Preference",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Special Request",
+              "displayName": "Special Request",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Confirmed By (Staff Name/AI)",
+              "displayName": "Confirmed By (Staff Name/AI)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Confirmation Timestamp",
+              "displayName": "Confirmation Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        520,
+        240
+      ],
+      "id": "1beb1940-44cc-4de1-b670-ea0270dfeff6",
+      "name": "Get Confirmed Reservation",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PxwoNtyH4xzWzz6T",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1V0B8k0b3wOyM9xGS4HNxYVsm9zPMd48g2Ty1DhGQ8fI",
+          "mode": "list",
+          "cachedResultName": "Confirmed Reservation Olas Food Restaurant",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1V0B8k0b3wOyM9xGS4HNxYVsm9zPMd48g2Ty1DhGQ8fI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1V0B8k0b3wOyM9xGS4HNxYVsm9zPMd48g2Ty1DhGQ8fI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Customer Name": "={{ $fromAI('Customer_Name','This is the Full name of the customer placing the reservation.') }}",
+            "Special Request": "={{ $fromAI('Special_Request','This is the Additional requests or notes (e.g., birthday, no peanuts, wheelchair access') }}",
+            "Confirmed By (Staff Name/AI)": "={{ $fromAI('Confirmed_By_Staff_Name_AI_', 'This is Who confirmed the reservation system either human agent or AI Agent') }}",
+            "Confirmation Timestamp": "={{ $fromAI('Confirmation_Timestamp', 'This is the Time when reservation was finalized') }}",
+            "Reservation ID": "={{ $fromAI('Reservation_ID',  'This is the Unique identifier for this reservation.') }}",
+            "Contact Number": "={{ $fromAI('Contact_Number',  'This is the Phone number used to reach the customer.') }}",
+            "Email": "={{ $fromAI('Email',  \"This is the Customer's email address.\") }}",
+            "Reservation Date": "={{ $fromAI('Reservation_Date',  'This is the Date for the reservation (e.g., 2025-07-05)') }}",
+            "Number of Guest": "={{ $fromAI('Number_of_Guest', 'This is the Number of people included in the booking') }}",
+            "Seating Preference": "={{ $fromAI('Seating_Preference', 'This is the specific seating request (e.g., window, outdoor, booth)') }}",
+            "Reservation Time": "={{ $fromAI('Reservation_Time', 'This is the Time of day for the reservation.') }}"
+          },
+          "matchingColumns": [
+            "Customer Name"
+          ],
+          "schema": [
+            {
+              "id": "Reservation ID",
+              "displayName": "Reservation ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Contact Number",
+              "displayName": "Contact Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Reservation Date",
+              "displayName": "Reservation Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Reservation Time",
+              "displayName": "Reservation Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Number of Guest",
+              "displayName": "Number of Guest",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Seating Preference",
+              "displayName": "Seating Preference",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Special Request",
+              "displayName": "Special Request",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Confirmed By (Staff Name/AI)",
+              "displayName": "Confirmed By (Staff Name/AI)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Confirmation Timestamp",
+              "displayName": "Confirmation Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        680,
+        260
+      ],
+      "id": "dfb50d34-d4d7-4f04-a88d-47da5b758465",
+      "name": "Update Confirmed Reservation1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PxwoNtyH4xzWzz6T",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1oRP4Qch85ms9ZgKqWFNPO6jH2lAKlhrTlO_YLMU1KIg",
+          "mode": "list",
+          "cachedResultName": "Orders Olas Food",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oRP4Qch85ms9ZgKqWFNPO6jH2lAKlhrTlO_YLMU1KIg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oRP4Qch85ms9ZgKqWFNPO6jH2lAKlhrTlO_YLMU1KIg/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        840,
+        280
+      ],
+      "id": "3092aa16-0a96-418a-a57c-f3ad1e15f27d",
+      "name": "Get Orders",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PxwoNtyH4xzWzz6T",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1oRP4Qch85ms9ZgKqWFNPO6jH2lAKlhrTlO_YLMU1KIg",
+          "mode": "list",
+          "cachedResultName": "Orders Olas Food",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oRP4Qch85ms9ZgKqWFNPO6jH2lAKlhrTlO_YLMU1KIg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oRP4Qch85ms9ZgKqWFNPO6jH2lAKlhrTlO_YLMU1KIg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Order ID": "={{ $fromAI('Order_ID', 'This is the Unique identifier to match or update existing order') }}",
+            "Customer Name": "={{ $fromAI('Customer_Name', 'This is the Name of the person placing the order') }}",
+            "Food Items": "={{ $fromAI('Food_Items',  'This is the Selected food items from the menu') }}",
+            "Quantity ": "={{ $fromAI('Quantity_',  'This is the Number of each item ordered') }}",
+            "Special Instruction": "={{ $fromAI('Special_Instruction', 'This is the Custom requests (e.g., no onions)') }}",
+            "Pickup/Delivery": "={{ $fromAI('Pickup_Delivery', 'This is the Fulfillment method either Pickup method or Delivery method') }}",
+            "Time": "={{ $fromAI('Time',  'Preferred pickup or delivery time') }}",
+            "Status": "={{ $fromAI('Status', 'Order progress (e.g., confirmed, pending)') }}"
+          },
+          "matchingColumns": [
+            "Order ID"
+          ],
+          "schema": [
+            {
+              "id": "Order ID",
+              "displayName": "Order ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Food Items",
+              "displayName": "Food Items",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quantity ",
+              "displayName": "Quantity ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Special Instruction",
+              "displayName": "Special Instruction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Pickup/Delivery",
+              "displayName": "Pickup/Delivery",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Time",
+              "displayName": "Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        1020,
+        280
+      ],
+      "id": "ee11e9ae-d4cd-4dbd-b5c2-88c6e538edc6",
+      "name": "Update Orders",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PxwoNtyH4xzWzz6T",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.3,
+      "position": [
+        660,
+        0
+      ],
+      "id": "11400399-aa05-4285-8a2a-aae0d2237c26",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to access Menu items",
+        "workflowId": {
+          "__rl": true,
+          "value": "R2BVK5ymKSEnDVZC",
+          "mode": "list",
+          "cachedResultName": "Database"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('query', `This represents the customer's specific request or filtering criteria used to retrieve relevant menu items from the database.`, 'string') }}"
+          },
+          "matchingColumns": [
+            "query"
+          ],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1160,
+        280
+      ],
+      "id": "c33086f5-ec25-45fb-8a8c-f58691660974",
+      "name": "Menu Database"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n-nktu.onrender.com",
+            "user-agent": "Python/3.12 aiohttp/3.11.16",
+            "content-length": "30",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1",
+            "cf-connecting-ip": "34.59.11.47",
+            "cf-ipcountry": "US",
+            "cf-ray": "95f8b6278d3713ce-PDX",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "content-type": "application/json",
+            "render-proxy-ttl": "4",
+            "rndr-id": "3f229c58-9202-4ecc",
+            "true-client-ip": "34.59.11.47",
+            "x-forwarded-for": "34.59.11.47, 172.68.174.105, 10.220.56.120",
+            "x-forwarded-proto": "https",
+            "x-request-start": "1752576759029444"
+          },
+          "params": {},
+          "query": {
+            "request": "customer name is Ola. The order is one fried rice with shredded chicken and two pieces of chicken for delivery at twelve thirty"
+          },
+          "body": {
+            "query": "create food order"
+          },
+          "webhookUrl": "https://n8n-nktu.onrender.com/webhook/a97349f6-b3a9-4a30-8f0f-ae30c20a7438",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Reservation Availability": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Reservation Availability": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Confirmed Reservation": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Confirmed Reservation1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Orders": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Orders": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menu Database": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3477f104-4520-4459-bb58-7bda65eb2e43",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "18338beddeb18366509a1aaf5f135b26f4afeaa33bcd01977cc2c78db7ca6f59"
+  },
+  "id": "9fgn6F0zkSxUOpp1",
+  "tags": []
+}
